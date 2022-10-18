@@ -20,7 +20,7 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <form action="" method="POST">
+                    <form action="<?php echo base_url();?>customer/store" method="POST">
                         <!-- Email input -->
                         <div class="form-outline mb-4">
                             <label class="form-label" for="form3Example3">Email</label>
