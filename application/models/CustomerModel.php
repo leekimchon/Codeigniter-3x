@@ -43,7 +43,15 @@ class CustomerModel extends CI_Model
         }
     }
 
-    public function updateDownloadedByEmail($email, ){
+    public function updateDownloadedByEmail($email,)
+    {
         $this->db->where('email', $email);
+    }
+
+    public function getAll()
+    {
+        $customers = $this->db->get('customers');
+        
+        return $customers->result();
     }
 }

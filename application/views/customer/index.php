@@ -43,11 +43,11 @@
                         <div class="form-outline mb-4">
                             <label class="form-check-label">Giới tính</label>
                             <div class="form-check">
-                                <input type="radio" class="form-check-input" id="radio1" name="gender" value="male" checked>
+                                <input type="radio" class="form-check-input" id="radio1" name="gender" value="1" checked>
                                 <label class="form-check-label" for="radio1">Nam</label>
                             </div>
                             <div class="form-check">
-                                <input type="radio" class="form-check-input" id="radio2" name="gender" value="female">
+                                <input type="radio" class="form-check-input" id="radio2" name="gender" value="0">
                                 <label class="form-check-label" for="radio2">Nữ</label>
                             </div>
                         </div>
