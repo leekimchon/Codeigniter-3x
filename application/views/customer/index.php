@@ -97,38 +97,39 @@
                 }],
                 submit: function(e) {
                     e.preventDefault();
-                    console.log(e.model.day_of_birth)
-                    // $.ajax({
-                    //     url: base_url + 'customer',
-                    //     type: 'POST',
-                    //     data: e.model,
-                    //     success: function(res) {
-                    //         res = JSON.parse(res);
 
-                    //         if (res.length) {
-                    //             if (confirm('Email đã đăng ký, gửi lại email xác minh')) {
-                    //                 $.ajax({
-                    //                     url: base_url + 'customer/resend-mail',
-                    //                     type: 'POST',
-                    //                     data: res.data_inserts,
-                    //                     success: function(res) {
-                    //                         alert('Gửi lại email xác minh thành công');
-                    //                     },
-                    //                     error: function() {
-                    //                         alert('Gửi lại email xác minh thất bại');
-                    //                     }
-                    //                 })
-                    //             }
-                    //         } else {
-                    //             var form = $("#registerForm").data("kendoForm");
-                    //             alert('Đăng ký thành công, vui lòng xác minh email');
-                    //             form.clear();
-                    //         }
-                    //     },
-                    //     error: function() {
-                    //         alert('Đăng ký thất bại');
-                    //     }
-                    // })
+                    $.ajax({
+                        url: base_url + 'customer',
+                        type: 'POST',
+                        data: e.model,
+                        success: function(res) {
+                            res = JSON.parse(res);
+                            
+                            if (!$.isEmptyObject(res)) {
+                                if (confirm('Email đã đăng ký, gửi lại email xác minh')) {
+                                    $.ajax({
+                                        url: base_url + 'customer/resend-mail',
+                                        type: 'POST',
+                                        data: res.data_inserts,
+                                        success: function(res) {
+                                            alert('Gửi lại email xác minh thành công');
+                                            location.reload();
+                                        },
+                                        error: function() {
+                                            alert('Gửi lại email xác minh thất bại');
+                                        }
+                                    })
+                                }
+                            } else {
+                                var form = $("#registerForm").data("kendoForm");
+                                alert('Đăng ký thành công, vui lòng xác minh email');
+                                location.reload();
+                            }
+                        },
+                        error: function() {
+                            alert('Đăng ký thất bại');
+                        }
+                    })
                 },
             });
 
