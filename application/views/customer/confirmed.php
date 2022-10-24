@@ -12,12 +12,7 @@
 <body>
     <div class="container">
         <div class="row justify-content-center text-center mt-3">
-            <?php if ($customer) { ?>
-                <h2>đã gửi tài liệu, vui lòng kiểm tra email!</h2>
-            <?php } else { ?>
-                <h2>Lỗi, bạn chưa đăng ký!</h2>
-            <?php } ?>
-
+            <h2>đã gửi tài liệu, vui lòng kiểm tra email!</h2>
         </div>
     </div>
 </body>

@@ -55,10 +55,10 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['customer']['get']="customer/index";
 $route['customer']['post']="customer/store";
-$route['customer/confirm/(:any)']['get']="customer/confirm/$1";
+$route['customer/confirm']['post']="customer/confirm";
 $route['customer/resend-mail']['post']="customer/resendEmailConfirm";
 $route['customer/read-mail/(:any)']['get']="customer/readMail/$1";
-$route['customer/download/(:any)']['get']="customer/download/$1";
+$route['customer/download']['post']="customer/download";
 
 //admin
 $route['admin/customer']['get']="admin/customer/index";

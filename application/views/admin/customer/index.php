@@ -28,7 +28,7 @@
         <script>
             $(document).ready(function() {
                 var customers = <?php echo $customers ?>;
-
+                var base_url = 'http://localhost:8080/';
                 $("#grid").kendoGrid({
                     dataSource: {
                         data: customers,
@@ -69,8 +69,7 @@
                         input: true,
                         numeric: false
                     },
-                    columns: [
-                        {
+                    columns: [{
                             field: "name",
                             title: "Tên",
                             filterable: false,
@@ -78,9 +77,14 @@
                         {
                             field: "gender",
                             title: "Giới tính",
-                            values: [
-                                {text: 'Nam', value: 1},
-                                {text: 'Nữ', value: 0},
+                            values: [{
+                                    text: 'Nam',
+                                    value: 1
+                                },
+                                {
+                                    text: 'Nữ',
+                                    value: 0
+                                },
                             ],
                             filterable: false,
                         },
@@ -104,31 +108,53 @@
                             field: "mail_active",
                             width: 160,
                             title: "Mail đã xác minh",
-                            filterable: { multi: true, search: true},
-                            values: [
-                                {text: 'Đã xác minh', value: 1},
-                                {text: 'Chưa xác minh', value: 0},
+                            filterable: {
+                                multi: true,
+                                search: true
+                            },
+                            values: [{
+                                    text: 'Đã xác minh',
+                                    value: 1
+                                },
+                                {
+                                    text: 'Chưa xác minh',
+                                    value: 0
+                                },
                             ],
                         },
                         {
                             field: "email_readed_at",
                             title: "Mail đã đọc",
-                            filterable: { multi: true, search: true},
+                            filterable: {
+                                multi: true,
+                                search: true
+                            },
                             template: "#if(email_readed_at){#  Đã đọc # }else{#  Chưa đọc  #}#"
                         },
                         {
-                            field: "dowloaded_at",
+                            field: "downloaded",
                             title: "Download",
-                            filterable: { multi: true, search: true},
-                            template: "#if(dowloaded_at){#  Đã download # }else{#  Chưa download  #}#"
+                            filterable: {
+                                multi: true,
+                                search: true
+                            },
+                            values: [{
+                                    text: 'Đã download',
+                                    value: 1
+                                },
+                                {
+                                    text: 'Chưa download',
+                                    value: 0
+                                },
+                            ],
                         },
                         {
-                            field: "dowloaded_at",
+                            field: "downloaded_at",
                             title: "Ngày download",
                             filterable: false,
                             template: function(item) {
-                                if (item.dowloaded_at) {
-                                    return item.dowloaded_at;
+                                if (item.downloaded_at) {
+                                    return item.downloaded_at;
                                 } else {
                                     return 'Chưa download';
                                 }
@@ -149,16 +175,15 @@
                     var dataItem = grid.dataItem($(this).closest('tr'));
 
                     $.ajax({
-                        url: 'http://localhost:8080/customer/resend-mail',
+                        url: base_url + 'customer/resend-mail',
                         type: 'POST',
                         data: {
                             email: dataItem.email,
                         },
-                        success: function (data)
-                        {
+                        success: function(data) {
                             alert('Gửi mail xác minh thành công');
                         },
-                        error: function (){
+                        error: function() {
                             alert('Gửi mail xác minh thất bại');
                         }
                     })
@@ -170,13 +195,12 @@
                     var dataItem = grid.dataItem($(this).closest('tr'));
 
                     $.ajax({
-                        url: 'http://localhost:8080/customer/confirm/'+dataItem.code,
+                        url: base_url + 'customer/confirm/' + dataItem.code,
                         type: 'get',
-                        success: function ()
-                        {
+                        success: function() {
                             alert('Gửi mail download thành công');
                         },
-                        error: function (){
+                        error: function() {
                             alert('Gửi mail download thất bại');
                         }
                     })

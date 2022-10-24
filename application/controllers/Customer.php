@@ -17,80 +17,52 @@ class Customer extends CI_Controller
     public function store()
     {
         $values = [];
-        $data['name'] = $this->input->post('name');
-        $data['email'] = $this->input->post('email');
-        $data['mail_active'] = 0;
-        $data['day_of_birth'] = $this->input->post('day_of_birth');
-        $data['gender'] = $this->input->post('gender');
-        $data['job'] = $this->input->post('job');
-        $data['code'] = rand();
+        $data_inserts['name'] = $this->input->post('name');
+        $data_inserts['email'] = $this->input->post('email');
+        $data_inserts['mail_active'] = 0;
+        $data_inserts['day_of_birth'] = $this->input->post('day_of_birth');
+        $data_inserts['gender'] = $this->input->post('gender');
+        $data_inserts['job'] = $this->input->post('job');
+        $data_inserts['code'] = rand();
+        $data_inserts['downloaded'] = 0;
 
-        $this->form_validation->set_rules(
-            'email',
-            'Email',
-            'required|valid_email|is_unique[customers.email]',
-            array(
-                'required' => 'vui lòng nhập %s',
-                'valid_email' => '%s không đúng định dạng',
-                'is_unique' => '%s đã đăng ký',
-            )
-        );
-        $this->form_validation->set_rules(
-            "name",
-            "Tên",
-            "required",
-            array('required' => 'vui lòng nhập %s',)
-        );
-        $this->form_validation->set_rules(
-            "day_of_birth",
-            "Ngày sinh",
-            "required",
-            array('required' => 'vui lòng nhập %s',)
-        );
-        $this->form_validation->set_rules(
-            "job",
-            "Nghề nghiệp",
-            "required",
-            array('required' => 'vui lòng nhập %s',)
-        );
+        if ($this->CustomerModel->mail_exists($data_inserts['email'])) {
+            $errors = ['email_exist' => true];
+            $values = ['errors' => $errors, 'data_inserts' => $data_inserts];
+        } else {
+            $this->CustomerModel->store($data_inserts);
 
-        if ($this->form_validation->run() == false) {
-            if ($this->CustomerModel->mail_exists($data['email'])) {
-                $errors = ['email_exist' => true];
-                $values = ['errors' => $errors, 'data' => $data];
-            }
-            return $this->load->view('customer/index', $values);
+            $this->load->library('phpmailer_lib');
+            $mail = $this->phpmailer_lib->load();
+
+            $mail->isSMTP();
+            $mail->CharSet  = "utf-8";
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+
+            $sender = 'leekimchon005@gmail.com';
+            $password = 'nizxgatcfndguiyq';
+            $sender_name = 'Lê Chơn';
+
+            $mail->Username = $sender;
+            $mail->Password = $password;
+            $mail->SMTPSecure = 'ssl';
+            $mail->Port = 465;
+            $mail->setFrom($sender, $sender_name);
+
+            $mail->addAddress($data_inserts['email']);
+            $mail->isHTML(true);
+            $mail->Subject = 'Xác minh nhận tài liệu';
+            $content = "<b>Chào " . $data_inserts['name'] . "!</b><br>Xác minh email của bạn" .
+                "<form action='" . base_url('customer/confirm/') . "' method='POST'>
+                    <input type='hidden' name='code' value='" . $data_inserts['code'] . "'>
+                    <button>Xác nhận</button>
+                </form>";
+            $mail->Body = $content;
+            $mail->send();
         }
 
-        $id_insert = $this->CustomerModel->store($data);
-
-        $this->load->library('phpmailer_lib');
-        $mail = $this->phpmailer_lib->load();
-
-        $mail->isSMTP();
-        $mail->CharSet  = "utf-8";
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-
-        $sender = 'leekimchon005@gmail.com';
-        $password = 'nizxgatcfndguiyq';
-        $sender_name = 'Lê Chơn';
-
-        $mail->Username = $sender;
-        $mail->Password = $password;
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
-        $mail->setFrom($sender, $sender_name);
-
-        $mail->addAddress($data['email']);
-        $mail->isHTML(true);
-        $mail->Subject = 'Xác minh nhận tài liệu';
-        $content = "<b>Chào " . $data['name'] . "!</b><br>Xác minh email của bạn 
-        <a href='" . base_url('customer/confirm/') . $data['code'] . "'>Tại đây.</a>";
-        $mail->Body = $content;
-        $mail->send();
-
-        return $this->load->view('customer/confirm');
+        echo json_encode($values);
     }
 
     public function resendEmailConfirm()
@@ -122,18 +94,21 @@ class Customer extends CI_Controller
         $mail->addAddress($customer->email);
         $mail->isHTML(true);
         $mail->Subject = 'Xác minh nhận tài liệu';
-        $content = "<b>Chào " . $customer->name . "!</b><br>Xác minh email của bạn 
-        <a href='" . base_url('customer/confirm/') . $code . "'>Tại đây.</a>";
+        $content = $content = "<b>Chào " . $customer->name . "!</b><br>Xác minh email của bạn" .
+        "<form action='" . base_url('customer/confirm/') . "' method='POST'>
+            <input type='hidden' name='code' value='" . $code . "'>
+            <button>Xác nhận</button>
+        </form>";
         $mail->Body = $content;
         $mail->send();
 
         return $this->load->view('customer/confirm');
     }
 
-    public function confirm($code = '')
+    public function confirm()
     {
+        $code = $this->input->post('code');
         $customer = $this->CustomerModel->findCustomerByCode($code);
-        $values = ['customer' => $customer];
 
         if ($customer) {
             $data_updates = ['mail_active' => 1];
@@ -160,30 +135,34 @@ class Customer extends CI_Controller
             $mail->addAddress($customer->email);
             $mail->isHTML(true);
             $mail->Subject = 'Nhận tài liệu';
-            $content = "<b>Chào " . $customer->name . '!</b><br> Tải xuống tài liệu 
-            <a href="' . base_url('customer/download/') . $customer->code . '">Tại đây.</a>'
-            .'<img src="https://7733-113-161-38-201.ap.ngrok.io/customer/read-mail/'. $customer->code .'" style="display: none;"/>';
+            $content = "<b>Chào " . $customer->name . '!</b><br> Tải xuống tài liệu' .
+                "<form action='" . base_url('customer/download') . "' method='POST'>
+                    <input type='hidden' name='code' value='" . $code . "'>
+                    <button>Tải xuống</button>
+                </form>";
             $mail->Body = $content;
             $mail->send();
         }
-        return $this->load->view('customer/confirmed', $values);
+        return $this->load->view('customer/confirmed');
     }
 
-    public function download($code = '')
+    public function download()
     {
+        $code = $this->input->post('code');
         $customer = $this->CustomerModel->findCustomerByCode($code);
 
         if ($customer) {
-            if (!$customer->dowloaded_at) {
+            if (!$customer->downloaded_at) {
                 $date = date('Y-m-d H:i:s');
-                $data_updates = ['dowloaded_at' => $date];
+                $data_updates = ['downloaded_at' => $date, 'downloaded' => 1];
                 $this->CustomerModel->updateByEmail($customer->email, $data_updates);
             }
             force_download('download/test.txt', null);
         }
     }
 
-    public function readMail($code = ''){
+    public function readMail($code = '')
+    {
         $customer = $this->CustomerModel->findCustomerByCode($code);
 
         if ($customer) {
