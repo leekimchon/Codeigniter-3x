@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -53,12 +53,12 @@ $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['customer']['get']="customer/index";
-$route['customer']['post']="customer/store";
-$route['customer/confirm']['post']="customer/confirm";
-$route['customer/resend-mail']['post']="customer/resendEmailConfirm";
-$route['customer/read-mail/(:any)']['get']="customer/readMail/$1";
-$route['customer/download']['post']="customer/download";
+$route['customer']['get'] = "customer/index";
+$route['customer']['post'] = "customer/store";
+$route['customer/confirm']['post'] = "customer/confirm";
+$route['customer/resend-mail']['post'] = "customer/resendEmailConfirm";
+$route['customer/read-mail/(:any)']['get'] = "customer/readMail/$1";
+$route['customer/download']['post'] = "customer/download";
 
 //admin
-$route['admin/customer']['get']="admin/customer/index";
+$route['admin/customer']['get'] = "admin/customer/index";
