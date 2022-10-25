@@ -31,6 +31,9 @@
                 var base_url = 'http://localhost:8080/';
                 $("#grid").kendoGrid({
                     dataSource: {
+                        // transport: {
+                        //     read: base_url + 'admin/getAllcustomers',
+                        // },
                         data: customers,
                         schema: {
                             model: {
@@ -45,12 +48,15 @@
                                         type: "string"
                                     },
                                     email_readed_at: {
-                                        type: "string"
+                                        type: "date"
                                     },
                                     gender: {
                                         type: "string"
                                     },
                                     day_of_birth: {
+                                        type: "date"
+                                    },
+                                    downloaded_at: {
                                         type: "string"
                                     },
                                     job: {
@@ -91,6 +97,7 @@
                         {
                             field: "day_of_birth",
                             title: "Ngày sinh",
+                            format: "{0:dd/MM/yyyy}",
                             filterable: false,
                         },
                         {
@@ -151,6 +158,7 @@
                         {
                             field: "downloaded_at",
                             title: "Ngày download",
+                            format: "{0:dd-MMM-yyyy hh:mm:ss tt}",
                             filterable: false,
                             template: function(item) {
                                 if (item.downloaded_at) {

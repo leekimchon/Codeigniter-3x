@@ -22,11 +22,6 @@ class Customer extends CI_Controller
         $data_inserts['mail_active'] = 0;
         $data_inserts['day_of_birth'] = $this->input->post('day_of_birth');
         $data_inserts['gender'] = $this->input->post('gender');
-        if( $data_inserts['gender'] == 'Nam'){
-            $data_inserts['gender'] = 1;
-        }else{
-            $data_inserts['gender'] = 0;
-        }
         $data_inserts['job'] = $this->input->post('job');
         $data_inserts['code'] = rand();
         $data_inserts['downloaded'] = 0;

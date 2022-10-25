@@ -65,10 +65,7 @@
                         {
                             field: "day_of_birth",
                             label: "Ngày sinh",
-                            // editor: function(container, options) {
-                            //     $("<input type='date' name='" + options.field + "'/>")
-                            //         .appendTo(container);
-                            // },
+                            format: "{0:dd/MM/yyyy}",
                             validation: {
                                 required: {
                                     message: 'Vui lòng nhập Ngày sinh'
@@ -97,14 +94,19 @@
                 }],
                 submit: function(e) {
                     e.preventDefault();
-
+                    e.model.day_of_birth = $('#day_of_birth').val().split("/").reverse().join("/");
+                    if (e.model.gender == 'Nam') {
+                        e.model.gender = 1;
+                    } else {
+                        e.model.gender = 0;
+                    }
                     $.ajax({
                         url: base_url + 'customer',
                         type: 'POST',
                         data: e.model,
                         success: function(res) {
                             res = JSON.parse(res);
-                            
+
                             if (!$.isEmptyObject(res)) {
                                 if (confirm('Email đã đăng ký, gửi lại email xác minh')) {
                                     $.ajax({

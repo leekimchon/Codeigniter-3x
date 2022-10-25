@@ -15,4 +15,10 @@ class Customer extends CI_Controller
         $values = ['customers' => $customers];
         return $this->load->view('admin\customer\index', $values);
     }
+
+    public function getAllcustomers()
+    {
+        $customers = $this->CustomerModel->getAll();
+        echo json_encode($customers);
+    }
 }
