@@ -32,7 +32,7 @@
     <script>
         $(document).ready(function() {
             var validationSuccess = $("#validation-success");
-            var base_url = 'http://localhost:8080/';
+            var base_url = 'http://localhost/Codeigniter-3x/index.php/';
 
             $("#registerForm").kendoForm({
                 formData: {
