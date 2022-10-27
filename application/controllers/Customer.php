@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+require './vendor/autoload.php';
+use Pheanstalk\Pheanstalk;
 
 class Customer extends CI_Controller
 {
@@ -27,39 +29,39 @@ class Customer extends CI_Controller
         $data_inserts['downloaded'] = 0;
         
         if ($this->CustomerModel->mail_exists($data_inserts['email'])) {
-            $errors = ['email_exist' => true];
-            $values = ['errors' => $errors, 'data_inserts' => $data_inserts];
+            $values = [
+                'email_exist' => true,
+                'data_inserts' => $data_inserts
+            ];
         } else {
+            $values = [
+                'email_exist' => false,
+                'data_inserts' => $data_inserts
+            ];
             $this->CustomerModel->store($data_inserts);
-
-            $this->load->library('phpmailer_lib');
-            $mail = $this->phpmailer_lib->load();
-
-            $mail->isSMTP();
-            $mail->CharSet  = "utf-8";
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-
-            $sender = 'leekimchon005@gmail.com';
-            $password = 'nizxgatcfndguiyq';
-            $sender_name = 'Lê Chơn';
-
-            $mail->Username = $sender;
-            $mail->Password = $password;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Port = 465;
-            $mail->setFrom($sender, $sender_name);
-
-            $mail->addAddress($data_inserts['email']);
-            $mail->isHTML(true);
-            $mail->Subject = 'Xác minh nhận tài liệu';
-            $content = "<b>Chào " . $data_inserts['name'] . "!</b><br>Xác minh email của bạn" .
-                "<form action='" . base_url('customer/confirm/') . "' method='POST'>
-                    <input type='hidden' name='code' value='" . $data_inserts['code'] . "'>
-                    <button>Xác nhận</button>
-                </form>";
-            $mail->Body = $content;
-            $mail->send();
+            
+            //producer
+            $mailPayload = new stdClass();
+            $mailPayload->Host = "smtp.gmail.com";
+            $mailPayload->SMTPAuth = true;
+            $mailPayload->Username = "leekimchon005@gmail.com";
+            $mailPayload->Password = "nizxgatcfndguiyq";
+            $mailPayload->SMTPSecure = "tls";
+            $mailPayload->Port = 587;
+            $mailPayload->FromEmail = "leekimchon005@gmail.com";
+            $mailPayload->FromName = "Le Chon";
+            $mailPayload->To = $data_inserts['email'];
+            $mailPayload->isHTML = true;
+            $mailPayload->Subject = "Xác minh nhận tài liệu";
+            $mailPayload->Body = "<b>Chào " . $data_inserts['name'] . "!</b><br>Xác minh email của bạn" .
+            "<form action='" . base_url('customer/confirm/') . "' method='POST'>
+                <input type='hidden' name='code' value='" . $data_inserts['code'] . "'>
+                <button>Xác nhận</button>
+            </form>";
+            $mailPayload->Callback = "UpdateSendStatus";
+            
+            $queue = Pheanstalk::create('127.0.0.1');
+            $queue->useTube('smailer')->put(json_encode($mailPayload));
         }
 
         echo json_encode($values);
@@ -73,34 +75,27 @@ class Customer extends CI_Controller
         $data_updates = ['code' => $code];
         $this->CustomerModel->updateByEmail($email, $data_updates);
 
-        $this->load->library('phpmailer_lib');
-        $mail = $this->phpmailer_lib->load();
-
-        $mail->isSMTP();
-        $mail->CharSet  = "utf-8";
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-
-        $sender = 'leekimchon005@gmail.com';
-        $password = 'nizxgatcfndguiyq';
-        $sender_name = 'Lê Chơn';
-
-        $mail->Username = $sender;
-        $mail->Password = $password;
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
-        $mail->setFrom($sender, $sender_name);
-
-        $mail->addAddress($customer->email);
-        $mail->isHTML(true);
-        $mail->Subject = 'Xác minh nhận tài liệu';
-        $content = $content = "<b>Chào " . $customer->name . "!</b><br>Xác minh email của bạn" .
+        $mailPayload = new stdClass();
+        $mailPayload->Host = "smtp.gmail.com";
+        $mailPayload->SMTPAuth = true;
+        $mailPayload->Username = "leekimchon005@gmail.com";
+        $mailPayload->Password = "nizxgatcfndguiyq";
+        $mailPayload->SMTPSecure = "tls";
+        $mailPayload->Port = 587;
+        $mailPayload->FromEmail = "leekimchon005@gmail.com";
+        $mailPayload->FromName = "Le Chon";
+        $mailPayload->To = $customer->email;
+        $mailPayload->isHTML = true;
+        $mailPayload->Subject = "Xác minh nhận tài liệu";
+        $mailPayload->Body = "<b>Chào " . $customer->name . "!</b><br>Xác minh email của bạn" .
         "<form action='" . base_url('customer/confirm/') . "' method='POST'>
             <input type='hidden' name='code' value='" . $code . "'>
             <button>Xác nhận</button>
         </form>";
-        $mail->Body = $content;
-        $mail->send();
+        $mailPayload->Callback = "UpdateSendStatus";
+        
+        $queue = Pheanstalk::create('127.0.0.1');
+        $queue->useTube('smailer')->put(json_encode($mailPayload));
     }
 
     public function confirm()
@@ -112,34 +107,27 @@ class Customer extends CI_Controller
             $data_updates = ['mail_active' => 1];
             $this->CustomerModel->updateByEmail($customer->email, $data_updates);
 
-            $this->load->library('phpmailer_lib');
-            $mail = $this->phpmailer_lib->load();
-
-            $mail->isSMTP();
-            $mail->CharSet  = "utf-8";
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-
-            $sender = 'leekimchon005@gmail.com';
-            $password = 'nizxgatcfndguiyq';
-            $sender_name = 'Lê Chơn';
-
-            $mail->Username = $sender;
-            $mail->Password = $password;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Port = 465;
-            $mail->setFrom($sender, $sender_name);
-
-            $mail->addAddress($customer->email);
-            $mail->isHTML(true);
-            $mail->Subject = 'Nhận tài liệu';
-            $content = "<b>Chào " . $customer->name . '!</b><br> Tải xuống tài liệu' .
-                "<form action='" . base_url('customer/download') . "' method='POST'>
-                    <input type='hidden' name='code' value='" . $code . "'>
-                    <button>Tải xuống</button>
-                </form>";
-            $mail->Body = $content;
-            $mail->send();
+            $mailPayload = new stdClass();
+            $mailPayload->Host = "smtp.gmail.com";
+            $mailPayload->SMTPAuth = true;
+            $mailPayload->Username = "leekimchon005@gmail.com";
+            $mailPayload->Password = "nizxgatcfndguiyq";
+            $mailPayload->SMTPSecure = "tls";
+            $mailPayload->Port = 587;
+            $mailPayload->FromEmail = "leekimchon005@gmail.com";
+            $mailPayload->FromName = "Le Chon";
+            $mailPayload->To = $customer->email;
+            $mailPayload->isHTML = true;
+            $mailPayload->Subject = "Nhận tài liệu";
+            $mailPayload->Body = "<b>Chào " . $customer->name . '!</b><br> Tải xuống tài liệu' .
+            "<form action='" . base_url('customer/download') . "' method='POST'>
+                <input type='hidden' name='code' value='" . $code . "'>
+                <button>Tải xuống</button>
+            </form>";
+            $mailPayload->Callback = "UpdateSendStatus";
+            
+            $queue = Pheanstalk::create('127.0.0.1');
+            $queue->useTube('smailer')->put(json_encode($mailPayload));
         }
         return $this->load->view('customer/confirmed');
     }

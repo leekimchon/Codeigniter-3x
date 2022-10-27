@@ -37,7 +37,10 @@
             $("#registerForm").kendoForm({
                 formData: {
                     day_of_birth: new Date(),
-                    gender: 'Nam'
+                    gender: 'Nam',
+                    email: 'leekimchon01@gmail.com',//test
+                    name: 'chon',//test
+                    job: 'bla bla'//test
                 },
                 items: [{
                     type: "group",
@@ -107,7 +110,7 @@
                         success: function(res) {
                             res = JSON.parse(res);
 
-                            if (!$.isEmptyObject(res)) {
+                            if (res.email_exist) {
                                 if (confirm('Email đã đăng ký, gửi lại email xác minh')) {
                                     $.ajax({
                                         url: base_url + 'customer/resend-mail',
