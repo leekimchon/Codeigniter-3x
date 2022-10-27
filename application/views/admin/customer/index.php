@@ -28,7 +28,7 @@
         <script>
             $(document).ready(function() {
                 var customers = <?php echo $customers ?>;
-                var base_url = 'http://localhost/Codeigniter-3x/index.php/';
+                var base_url = 'http://localhost:8080/';
                 $("#grid").kendoGrid({
                     dataSource: {
                         // transport: {
