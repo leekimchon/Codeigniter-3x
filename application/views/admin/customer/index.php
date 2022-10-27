@@ -203,8 +203,11 @@
                     var dataItem = grid.dataItem($(this).closest('tr'));
 
                     $.ajax({
-                        url: base_url + 'customer/confirm/' + dataItem.code,
-                        type: 'get',
+                        url: base_url + 'customer/confirm',
+                        type: 'POST',
+                        data: {
+                            code: dataItem.code,
+                        },
                         success: function() {
                             alert('Gửi mail download thành công');
                         },
