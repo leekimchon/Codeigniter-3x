@@ -27,14 +27,15 @@
 
         <script>
             $(document).ready(function() {
-                var customers = <?php echo $customers ?>;
                 var base_url = 'http://localhost:8080/';
                 $("#grid").kendoGrid({
                     dataSource: {
-                        // transport: {
-                        //     read: base_url + 'admin/getAllcustomers',
-                        // },
-                        data: customers,
+                        transport: {
+                            read: {
+                                url: base_url + 'api/customers',
+                                dataType: "json",
+                            },
+                        },
                         schema: {
                             model: {
                                 fields: {

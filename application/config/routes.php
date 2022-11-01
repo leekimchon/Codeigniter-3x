@@ -62,4 +62,4 @@ $route['customer/download']['post'] = "customer/download";
 
 //admin
 $route['admin/customer']['get'] = "admin/customer/index";
-$route['admin/getAllcustomers']['get'] = "admin/customer/getAllcustomers";
+$route['api/customers']['get'] = "admin/customer/getAll";

@@ -10,15 +10,12 @@ class Customer extends CI_Controller
     }
 
     public function index(){
-        $customers = $this->CustomerModel->getAll();
-        $customers = json_encode($customers);
-        $values = ['customers' => $customers];
-        return $this->load->view('admin/customer/index', $values);
+        return $this->load->view('admin/customer/index');
     }
 
-    public function getAllcustomers()
+    public function getAll()
     {
-        $customers = $this->CustomerModel->getAll();
+        $customers = $this->CustomerModel->getAll()->toArray();
         echo json_encode($customers);
     }
 }

@@ -8,6 +8,7 @@ class Customer extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        
         $this->load->model('CustomerModel');
     }
 
@@ -27,6 +28,7 @@ class Customer extends CI_Controller
         $data_inserts['job'] = $this->input->post('job');
         $data_inserts['code'] = rand();
         $data_inserts['downloaded'] = 0;
+        $data_inserts['downloaded_at'] = null;
         
         if ($this->CustomerModel->mail_exists($data_inserts['email'])) {
             $values = [
@@ -100,9 +102,8 @@ class Customer extends CI_Controller
 
     public function confirm()
     {
-        $code = $this->input->post('code');
+        $code = (int)$this->input->post('code');
         $customer = $this->CustomerModel->findCustomerByCode($code);
-
         if ($customer) {
             $data_updates = ['mail_active' => 1];
             $this->CustomerModel->updateByEmail($customer->email, $data_updates);
@@ -134,10 +135,10 @@ class Customer extends CI_Controller
 
     public function download()
     {
-        $code = $this->input->post('code');
+        $code = (int)$this->input->post('code');
         $customer = $this->CustomerModel->findCustomerByCode($code);
 
-        if ($customer) {
+        if ($customer && $customer->mail_active) {
             if (!$customer->downloaded_at) {
                 $date = date('Y-m-d H:i:s');
                 $data_updates = ['downloaded_at' => $date, 'downloaded' => 1];

@@ -1,57 +1,58 @@
 <?php
 class CustomerModel extends CI_Model
 {
+    private $database;
+
     public function __construct()
     {
-        // $this->load->database('default');
-        // $this->load->library('session');
-
-        // Call the Model constructor
         parent::__construct();
+        $this->load->library('mongodb');
+        $this->database = $this->mongodb->getDB();
     }
 
-    public function store($data)
+    public function store($data_inserts)
     {
-        $this->db->insert('customers', $data);
-        return $this->db->insert_id();
+        // $this->db->insert('customers', $data_inserts);
+        // return $this->db->insert_id();
+        // dd(1);
+        $this->database->customers->insertOne($data_inserts);
     }
 
     public function updateByEmail($email, $data_updates)
     {
-        $this->db->where('email', $email);
-        return $this->db->update('customers', $data_updates);
+        // $this->db->where('email', $email);
+        // return $this->db->update('customers', $data_updates);
+        $this->database->customers->updateOne(['email' => $email], ['$set' => $data_updates]);
     }
 
     public function findCustomerByCode($code)
     {
-        return $this->db->get_where('customers', array('code' => $code))->row();
+        // return $this->db->get_where('customers', array('code' => $code))->row();
+        return $this->database->customers->findOne(['code' => $code]);
     }
 
     public function findCustomerByEmail($email)
     {
-        return $this->db->get_where('customers', array('email' => $email))->row();
+        return $this->database->customers->findOne(['email' => $email]);
     }
 
     public function mail_exists($email)
     {
-        $this->db->where('email', $email);
-        $query = $this->db->get('customers');
-        if ($query->num_rows() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function updateDownloadedByEmail($email,)
-    {
-        $this->db->where('email', $email);
+        // $this->db->where('email', $email);
+        // $query = $this->db->get('customers');
+        // if ($query->num_rows() > 0) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+        return $this->database->customers->findOne(['email' => $email]);
     }
 
     public function getAll()
     {
-        $customers = $this->db->get('customers');
+        // $customers = $this->db->get('customers');
         
-        return $customers->result();
+        // return $customers->result();
+        return $this->database->customers->find();
     }
 }
